@@ -1,0 +1,27 @@
+package madp.auth.domain.infrastructure.security.strategy;
+
+import madp.auth.domain.domain.enums.OAuth2Type;
+import madp.auth.domain.exception.UnsupportedOAuth2ProviderException;
+import org.springframework.stereotype.Component;
+
+import java.util.Map;
+import java.util.Optional;
+import java.util.Set;
+
+import static java.util.function.UnaryOperator.identity;
+import static java.util.stream.Collectors.toMap;
+
+@Component
+public class OAuth2StrategyComposite {
+    private final Map<OAuth2Type, OAuth2Strategy> oauth2ProviderMap;
+
+    public OAuth2StrategyComposite(Set<OAuth2Strategy> clients) {
+        this.oauth2ProviderMap = clients.stream()
+                .collect(toMap(OAuth2Strategy::getOAuth2ProviderType, identity()));
+    }
+
+    public OAuth2Strategy getOAuth2Strategy(OAuth2Type providerType) {
+        return Optional.ofNullable(oauth2ProviderMap.get(providerType))
+                .orElseThrow(() -> new UnsupportedOAuth2ProviderException("not supported OAuth2 provider"));
+    }
+}
