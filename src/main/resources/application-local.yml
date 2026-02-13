@@ -36,6 +36,7 @@ spring:
             url: ${USER_SERVICE_URL:http://localhost:8081}
 
 jwt:
+  key-id: ${JWT_KEY_ID}
   secret: ${JWT_SECRET}
   access-expiration: 3600000
   refresh-expiration: 86400000

@@ -7,18 +7,41 @@ import madp.auth.domain.exception.RefreshTokenNotFoundException;
 import madp.auth.domain.infrastructure.jwt.constants.JwtConstants;
 import madp.auth.domain.presentation.dto.request.AuthCodeRequestDto;
 import madp.auth.domain.presentation.dto.response.TokenResponseDto;
+import madp.auth.global.properties.JwtProperties;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.KeyPair;
+import java.security.interfaces.RSAPublicKey;
+import java.util.Base64;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
 @RequestMapping("/auth")
 @RequiredArgsConstructor
 public class AuthController {
+    private final JwtProperties jwtProperties;
+    private final KeyPair keyPair;
     private final AuthService authService;
+
+    @GetMapping("/.well-known/jwks.json")
+    public Map<String, Object> getJwks() {
+        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
+
+        Map<String, Object> jwk = new HashMap<>();
+        jwk.put("kty", "RSA");
+        jwk.put("alg", "RS256");
+        jwk.put("use", "sig");
+        jwk.put("kid", jwtProperties.getKeyId());
+        jwk.put("n", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getModulus().toByteArray()));
+        jwk.put("e", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getPublicExponent().toByteArray()));
+
+        return Map.of("keys", List.of(jwk));
+    }
 
     @PostMapping("/reissue")
     public ResponseEntity<Map<String, String>> reissue(@CookieValue(value = JwtConstants.REFRESH_TOKEN_COOKIE_HEADER, required = false) String refreshToken) {
