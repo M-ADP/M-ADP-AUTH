@@ -1,4 +1,4 @@
-package madp.auth.domain.domain.enums;
+package madp.auth.global.enums;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

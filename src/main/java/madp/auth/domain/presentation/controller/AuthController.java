@@ -32,15 +32,15 @@ public class AuthController {
     public Map<String, Object> getJwks() {
         RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
 
-        Map<String, Object> jwk = new HashMap<>();
-        jwk.put("kty", "RSA");
-        jwk.put("alg", "RS256");
-        jwk.put("use", "sig");
-        jwk.put("kid", jwtProperties.getKeyId());
-        jwk.put("n", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getModulus().toByteArray()));
-        jwk.put("e", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getPublicExponent().toByteArray()));
+        Map<String, Object> jwks = new HashMap<>();
+        jwks.put("kty", "RSA");
+        jwks.put("alg", "RS256");
+        jwks.put("use", "sig");
+        jwks.put("kid", jwtProperties.getKeyId());
+        jwks.put("n", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getModulus().toByteArray()));
+        jwks.put("e", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getPublicExponent().toByteArray()));
 
-        return Map.of("keys", List.of(jwk));
+        return Map.of("keys", List.of(jwks));
     }
 
     @PostMapping("/reissue")

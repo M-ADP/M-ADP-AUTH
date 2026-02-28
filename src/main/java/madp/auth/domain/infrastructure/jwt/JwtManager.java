@@ -1,7 +1,7 @@
 package madp.auth.domain.infrastructure.jwt;
 
 import io.jsonwebtoken.Jwts;
-import madp.auth.domain.domain.enums.Role;
+import madp.auth.global.enums.Role;
 import madp.auth.domain.infrastructure.jwt.constants.JwtConstants;
 import madp.auth.global.properties.JwtProperties;
 import org.springframework.beans.factory.annotation.Autowired;

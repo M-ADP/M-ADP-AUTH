@@ -2,7 +2,7 @@ package madp.auth.domain.infrastructure.security.service;
 
 import lombok.RequiredArgsConstructor;
 import madp.auth.domain.domain.enums.OAuth2Type;
-import madp.auth.domain.domain.enums.Role;
+import madp.auth.global.enums.Role;
 import madp.auth.domain.exception.FailedOAuth2AuthenticationException;
 import madp.auth.domain.infrastructure.client.UserClient;
 import madp.auth.domain.infrastructure.client.request.OAuth2UserInformationRequestDto;

@@ -3,7 +3,7 @@ package madp.auth.domain.infrastructure.security.vo;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NonNull;
-import madp.auth.domain.domain.enums.Role;
+import madp.auth.global.enums.Role;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.core.user.OAuth2User;

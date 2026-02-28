@@ -1,7 +1,7 @@
 package madp.auth.global.configuration;
 
 import lombok.RequiredArgsConstructor;
-import madp.auth.domain.domain.enums.Role;
+import madp.auth.global.enums.Role;
 import madp.auth.domain.infrastructure.security.handler.MadpOAuth2FailureHandler;
 import madp.auth.domain.infrastructure.security.handler.MadpOAuth2SuccessHandler;
 import madp.auth.domain.infrastructure.security.resolver.MadpOAuth2AuthorizationRequestResolver;
@@ -10,7 +10,6 @@ import madp.auth.global.properties.WebProperties;
 import madp.auth.global.security.filter.MadpUserInfoExtractorFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -31,7 +30,7 @@ public class SecurityConfiguration {
     private final MadpOAuth2SuccessHandler madpOAuth2SuccessHandler;
     private final MadpOAuth2FailureHandler madpOAuth2FailureHandler;
     private final MadpOAuth2AuthorizationRequestResolver madpOAuth2AuthorizationRequestResolver;
-    private static final String[] excludedPaths = {"/auth/reissue", "/auth/code", "/oauth2/callback/**", "/oauth2/authorization/google", "/actuator/health"};
+    private static final String[] excludedPaths = {"/auth/reissue", "/auth/code", "/oauth2/callback/**", "/oauth2/authorization/google", "/actuator/health", "/auth/.well-known/jwks.json"};
 
     @Bean
     public PathMatcher pathMatcher() {return new AntPathMatcher();}
@@ -42,7 +41,7 @@ public class SecurityConfiguration {
                 .csrf(AbstractHttpConfigurer::disable)
                 .formLogin(AbstractHttpConfigurer::disable)
                 .httpBasic(AbstractHttpConfigurer::disable)
-                .cors(Customizer.withDefaults())
+                .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement((session) -> session
                         .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .anonymous(anonymous -> anonymous
@@ -68,7 +67,8 @@ public class SecurityConfiguration {
                                 "/auth/reissue",
                                 "/auth/code",
                                 "/oauth2/callback/**",
-                                "/oauth2/authorization/google"
+                                "/oauth2/authorization/google",
+                                "/auth/.well-known/jwks.json"
                         ).anonymous()
                         .requestMatchers("/oauth2/authorization/github").hasRole(Role.PARTIAL_AUTH.name())
                         .requestMatchers("/auth/logout").hasRole(Role.USER.name())

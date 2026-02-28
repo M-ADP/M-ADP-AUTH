@@ -30,7 +30,7 @@ public class InternalRequestInterceptor implements RequestInterceptor {
         String userRole = request.getHeader("X-User-Role");
         
         if (userId != null && userRole != null) {
-            addUserHeaders(template,  userId, userRole);
+            addUserHeaders(template, userId, userRole);
             return;
         }
 

@@ -6,7 +6,7 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import madp.auth.domain.domain.entity.AuthCodeEntity;
 import madp.auth.domain.domain.entity.TokenEntity;
-import madp.auth.domain.domain.enums.Role;
+import madp.auth.global.enums.Role;
 import madp.auth.domain.domain.repository.AuthCodeRepository;
 import madp.auth.domain.domain.repository.TokenRepository;
 import madp.auth.domain.infrastructure.jwt.JwtManager;

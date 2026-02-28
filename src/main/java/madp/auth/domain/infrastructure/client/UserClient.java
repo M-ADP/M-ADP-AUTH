@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestBody;
         configuration = InternalServiceCommunicationConfiguration.class
 )
 public interface UserClient {
+    // VERSION 항목을 붙여야 함
     @PostMapping("/user/auth-status")
     UserAuthResponseDto getUserAuthStatus(@RequestBody OAuth2UserInformationRequestDto oAuth2UserInformationRequestDto);
 
