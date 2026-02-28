@@ -52,10 +52,6 @@ web:
 email:
   allowed-domain: ${ALLOWED_EMAIL_DOMAIN:@bssm.hs.kr}
 
-server:
-  servlet:
-    context-path: "/v${VERSION}"
-
 logging:
   level:
     madp.auth: DEBUG
