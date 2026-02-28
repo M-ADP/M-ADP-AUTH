@@ -30,7 +30,6 @@ public class SecurityConfiguration {
     private final MadpOAuth2SuccessHandler madpOAuth2SuccessHandler;
     private final MadpOAuth2FailureHandler madpOAuth2FailureHandler;
     private final MadpOAuth2AuthorizationRequestResolver madpOAuth2AuthorizationRequestResolver;
-    private static final String[] excludedPaths = {"/auth/reissue", "/auth/code", "/oauth2/callback/**", "/oauth2/authorization/google", "/actuator/health", "/auth/.well-known/jwks.json"};
 
     @Bean
     public PathMatcher pathMatcher() {return new AntPathMatcher();}
@@ -62,7 +61,7 @@ public class SecurityConfiguration {
                                 .userService(madpOAuth2UserService)
                         )
                 )
-                .addFilterAfter(new MadpUserInfoExtractorFilter(pathMatcher(), excludedPaths), SecurityContextHolderFilter.class);
+                .addFilterAfter(new MadpUserInfoExtractorFilter(), SecurityContextHolderFilter.class);
 
         return http.build();
     }

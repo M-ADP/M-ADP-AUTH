@@ -11,18 +11,14 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.util.PathMatcher;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 
 @RequiredArgsConstructor
 public class MadpUserInfoExtractorFilter extends OncePerRequestFilter {
-    private final PathMatcher pathMatcher;
-    private final String[] excludedPaths;
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull FilterChain filterChain) throws ServletException, IOException {
@@ -42,13 +38,5 @@ public class MadpUserInfoExtractorFilter extends OncePerRequestFilter {
         SecurityContextHolder.getContext().setAuthentication(authenticationToken);
 
         filterChain.doFilter(request, response);
-    }
-
-    @Override
-    protected boolean shouldNotFilter(HttpServletRequest request) {
-        String path = request.getRequestURI();
-
-        return Arrays.stream(excludedPaths)
-                .anyMatch(pattern -> pathMatcher.match(pattern, path));
     }
 }
