@@ -52,7 +52,7 @@ jwt:
   secret: ${JWT_SECRET}
   access-expiration: ${JWT_ACCESS_EXPIRATION:3600000}  # 1 hour
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:86400000}  # 24 hours
-  issuer: https://api.madp.cloud
+  issuer: ${JWT_ISSUER}
 
 code:
   auth:
