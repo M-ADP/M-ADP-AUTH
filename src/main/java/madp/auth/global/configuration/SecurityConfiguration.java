@@ -62,20 +62,6 @@ public class SecurityConfiguration {
                                 .userService(madpOAuth2UserService)
                         )
                 )
-                .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(
-                                "/auth/reissue",
-                                "/auth/code",
-                                "/oauth2/callback/**",
-                                "/oauth2/authorization/google",
-                                "/auth/.well-known/jwks.json"
-                        ).anonymous()
-                        .requestMatchers("/oauth2/authorization/github").hasRole(Role.PARTIAL_AUTH.name())
-                        .requestMatchers("/auth/logout").hasRole(Role.USER.name())
-                        .requestMatchers("/actuator/health").permitAll()
-                        .requestMatchers("/login").denyAll()
-                        .anyRequest().denyAll()
-                )
                 .addFilterAfter(new MadpUserInfoExtractorFilter(pathMatcher(), excludedPaths), SecurityContextHolderFilter.class);
 
         return http.build();
