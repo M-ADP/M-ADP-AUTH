@@ -64,10 +64,6 @@ web:
 email:
   allowed-domain: ${ALLOWED_EMAIL_DOMAIN}
 
-server:
-  servlet:
-    context-path: "/v${VERSION}"
-
 logging:
   level:
     madp.auth: INFO
