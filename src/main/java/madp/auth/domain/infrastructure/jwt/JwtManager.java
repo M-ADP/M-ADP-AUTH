@@ -66,6 +66,7 @@ public class JwtManager {
                 .claim(JwtConstants.CLAIM_MADE_BY_KEY, JwtConstants.CLAIM_MADE_BY_VALUE)
                 .claim(JwtConstants.CLAIM_ROLE_KEY, role)
                 .issuedAt(new Date(now))
+                .issuer(jwtProperties.getIssuer())
                 .expiration(expirationTime)
                 .signWith(secretKey)
                 .compact();
