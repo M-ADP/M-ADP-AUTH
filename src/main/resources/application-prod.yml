@@ -18,12 +18,14 @@ spring:
           google:
             client-id: ${GOOGLE_CLIENT_ID}
             client-secret: ${GOOGLE_CLIENT_SECRET}
+            redirect-uri: https://dev-api.madp.cloud/auth/oauth2/callback/google
             scope:
               - profile
               - email
           github:
             client-id: ${GITHUB_CLIENT_ID}
             client-secret: ${GITHUB_CLIENT_SECRET}
+            redirect-uri: https://dev-api.madp.cloud/auth/oauth2/callback/github
             scope:
               - user:email
               - read:user
