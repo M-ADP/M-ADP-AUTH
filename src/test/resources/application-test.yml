@@ -1,0 +1,52 @@
+spring:
+  data:
+    redis:
+      host: localhost
+      port: 6379
+      password:
+      database: 1  # Different database for tests
+  security:
+    oauth2:
+      client:
+        registration:
+          google:
+            client-id: test-google-client-id
+            client-secret: test-google-client-secret
+            scope:
+              - openid
+              - profile
+              - email
+          github:
+            client-id: test-github-client-id
+            client-secret: test-github-client-secret
+            scope:
+              - user:email
+              - read:user
+  cloud:
+    openfeign:
+      client:
+        config:
+          user-client:
+            url: http://localhost:8080
+
+jwt:
+  secret: test-jwt-secret-key-for-testing-only-not-secure
+  access-expiration: 60000   # 1 minute for faster test execution
+  refresh-expiration: 120000 # 2 minutes for faster test execution
+
+code:
+  auth:
+    expiration: 30000  # 30 seconds for faster test execution
+
+web:
+  front-end-url: http://localhost:3000
+  back-end-url: http://localhost:8080
+
+email:
+  allowed-domain: "@test.hs.kr"
+
+logging:
+  level:
+    madp.auth: DEBUG
+    org.springframework.security: DEBUG
+    root: ERROR  # Minimize test output
