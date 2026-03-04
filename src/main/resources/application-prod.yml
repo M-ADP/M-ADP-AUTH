@@ -1,4 +1,7 @@
 spring:
+  config:
+    import:
+      - file:/vault/secrets/.env[.properties]
   data:
     redis:
       host: ${REDIS_HOST:redis}
