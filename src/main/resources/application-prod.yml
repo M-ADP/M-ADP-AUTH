@@ -1,7 +1,4 @@
 spring:
-  config:
-    import:
-      - file:/vault/secrets/.env[.properties]
   data:
     redis:
       host: ${REDIS_HOST:redis}
@@ -64,7 +61,6 @@ code:
 
 web:
   front-end-url: ${FRONTEND_URL}
-  back-end-url: ${BACKEND_URL}
 
 email:
   allowed-domain: ${ALLOWED_EMAIL_DOMAIN}

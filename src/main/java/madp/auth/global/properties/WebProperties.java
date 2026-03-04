@@ -9,5 +9,4 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties(prefix = "web")
 public class WebProperties {
     private final String frontEndUrl;
-    private final String backEndUrl;
 }
