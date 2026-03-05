@@ -1,6 +1,5 @@
 package madp.auth.domain.infrastructure.security.resolver;
 
-import jakarta.servlet.http.Cookie;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +7,9 @@ import madp.auth.domain.domain.entity.OAuth2SessionEntity;
 import madp.auth.domain.domain.repository.OAuth2SessionRepository;
 import madp.auth.domain.infrastructure.security.constants.OAuth2SessionConstants;
 import madp.auth.global.properties.OAuth2SessionProperties;
+import org.springframework.boot.web.server.Cookie;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
@@ -85,17 +87,19 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
         HttpServletResponse response = attrs.getResponse();
 
         if (response != null) {
-            Cookie sessionCookie = createSessionCookie(sessionKey);
-            response.addCookie(sessionCookie);
+            addSessionCookie(response, sessionKey);
         }
     }
 
-    private Cookie createSessionCookie(String sessionKey) {
-        Cookie cookie = new Cookie(OAuth2SessionConstants.SESSION_COOKIE_NAME, sessionKey);
-        cookie.setHttpOnly(true);
-        cookie.setSecure(false);
-        cookie.setPath("/");
-        cookie.setMaxAge(oAuth2SessionProperties.getExpiration());
-        return cookie;
+    private void addSessionCookie(HttpServletResponse response, String sessionKey) {
+        ResponseCookie cookie = ResponseCookie.from(OAuth2SessionConstants.SESSION_COOKIE_NAME, sessionKey)
+                .httpOnly(true)
+                .secure(false)
+                .path("/")
+                .maxAge(oAuth2SessionProperties.getExpiration())
+                .sameSite(Cookie.SameSite.LAX.name())
+                .build();
+
+        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
     }
 }
