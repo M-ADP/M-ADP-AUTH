@@ -50,6 +50,7 @@ public class SecurityConfiguration {
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage(webProperties.getFrontEndUrl() + "/login")
                         .authorizationEndpoint(authorization -> authorization
+                                .baseUri("/auth/oauth2/authorization")
                                 .authorizationRequestRepository(redisOAuth2AuthorizationRequestRepository)
                         )
                         .redirectionEndpoint(redirection -> redirection
