@@ -61,9 +61,15 @@ public class InternalRequestInterceptor implements RequestInterceptor {
         if (encodedState == null || encodedState.isEmpty()) {
             return null;
         }
-        
-        String decoded = new String(Base64.getDecoder().decode(encodedState));
-        return decoded.split(":");
+
+        try {
+            String decoded = new String(Base64.getDecoder().decode(encodedState));
+            return decoded.split(":");
+        }
+        catch (IllegalArgumentException e) {
+            log.warn("[InternalInterceptor] Invalid Base64 format: {}", e.getMessage());
+            return null;
+        }
     }
     
     private boolean isValidUserInfo(String[] userInfo) {
