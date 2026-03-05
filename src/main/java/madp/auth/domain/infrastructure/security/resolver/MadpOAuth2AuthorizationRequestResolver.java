@@ -34,11 +34,13 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
 
     private OAuth2AuthorizationRequest customizeAuthorizationRequest(
             OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request) {
+        log.info(request.toString());
 
         // OAuth2 인증 안 함
         if (authorizationRequest == null) {
             return null;
         }
+        log.info(authorizationRequest.toString());
 
         String userId = request.getHeader("X-User-Id");
         String userRole = request.getHeader("X-User-Role");
