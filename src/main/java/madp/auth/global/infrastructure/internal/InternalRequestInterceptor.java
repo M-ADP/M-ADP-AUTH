@@ -4,7 +4,6 @@ import feign.RequestInterceptor;
 import feign.RequestTemplate;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import madp.auth.domain.domain.entity.OAuth2SessionEntity;
 import madp.auth.domain.domain.repository.OAuth2SessionRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -40,14 +39,13 @@ public class InternalRequestInterceptor implements RequestInterceptor {
             return;
         }
 
-        // OAuth2 콜백에서 state parameter 확인
-        String state = request.getParameter("state");
-        if(state == null || state.isEmpty()) return;
-        OAuth2SessionEntity oAuth2SessionEntity = getSessionByState(state);
-        if(oAuth2SessionEntity == null) return;
-        addUserHeaders(template, oAuth2SessionEntity.getUserId().toString(), oAuth2SessionEntity.getUserRole());
+        // OAuth2 콜백에서 user_id, user_role parameter 확인
+        String sessionId = request.getParameter("session_id");
 
-        log.info("[InternalInterceptor] No user info found in headers or state");
+        if (sessionId != null) {
+            log.info("[InternalInterceptor] Using OAuth2 callback parameters for user info");
+            oAuth2SessionRepository.findBySessionId(sessionId).ifPresent(oAuth2Session -> addUserHeaders(template, oAuth2Session.getUserId().toString(), oAuth2Session.getUserRole()));
+        }
     }
     
     private void addUserHeaders(RequestTemplate template, String userId, String userRole) {
@@ -56,7 +54,4 @@ public class InternalRequestInterceptor implements RequestInterceptor {
         template.header("X-User-Role", userRole);
     }
     
-    private OAuth2SessionEntity getSessionByState(String state) {
-        return oAuth2SessionRepository.findBySessionId(state).orElse(null);
-    }
 }

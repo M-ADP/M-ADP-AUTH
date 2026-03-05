@@ -31,10 +31,6 @@ public class MadpOAuth2UserService extends DefaultOAuth2UserService {
         log.info("[OAuth2UserService] clientRegistration: {}", userRequest.getClientRegistration());
         log.info("[OAuth2UserService] additionalParameters: {}", userRequest.getAdditionalParameters());
         
-        // State parameter 확인 NPE 방지
-        String state = (String) userRequest.getAdditionalParameters().get("state");
-        log.info("[OAuth2UserService] State parameter: '{}'", state);
-        
         OAuth2User oauth2User = super.loadUser(userRequest);
         log.info("[OAuth2UserService] OAuth2User loaded: {}", oauth2User.getName());
         log.info("[OAuth2UserService] OAuth2User attributes: {}", oauth2User.getAttributes());

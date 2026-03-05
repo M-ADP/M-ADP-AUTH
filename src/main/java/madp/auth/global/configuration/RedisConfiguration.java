@@ -23,6 +23,7 @@ public class RedisConfiguration {
         return redisTemplate;
     }
 
+
     private void configureSerializers(RedisTemplate<String, Object> template) {
         RedisSerializer<String> stringSerializer = RedisSerializer.string();
         RedisSerializer<Object> jsonSerializer = RedisSerializer.json();
