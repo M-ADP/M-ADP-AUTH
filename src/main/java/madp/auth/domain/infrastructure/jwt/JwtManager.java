@@ -1,37 +1,27 @@
 package madp.auth.domain.infrastructure.jwt;
 
 import io.jsonwebtoken.Jwts;
+import lombok.RequiredArgsConstructor;
 import madp.auth.global.enums.Role;
 import madp.auth.domain.infrastructure.jwt.constants.JwtConstants;
 import madp.auth.global.properties.JwtProperties;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.ResponseCookie;
 import org.springframework.stereotype.Component;
 
-import javax.crypto.SecretKey;
-import javax.crypto.spec.SecretKeySpec;
-import java.nio.charset.StandardCharsets;
+import java.security.KeyPair;
 import java.time.Duration;
 import java.util.Date;
 
 @Component
+@RequiredArgsConstructor
 public class JwtManager {
     private final JwtProperties jwtProperties;
-    private final SecretKey secretKey;
-
-    @Autowired
-    public JwtManager(JwtProperties jwtProperties) {
-        this.jwtProperties = jwtProperties;
-        this.secretKey = new SecretKeySpec(
-                jwtProperties.getSecret().getBytes(StandardCharsets.UTF_8),
-                Jwts.SIG.HS256.key().build().getAlgorithm()
-        );
-    }
+    private final KeyPair keyPair;
 
     public Long getUserId(String token) {
         String userId = Jwts.parser()
-                .verifyWith(secretKey)
+                .verifyWith(keyPair.getPublic())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -41,7 +31,7 @@ public class JwtManager {
 
     public Role getRole(String token) {
         String role = Jwts.parser()
-                .verifyWith(secretKey)
+                .verifyWith(keyPair.getPublic())
                 .build()
                 .parseSignedClaims(token)
                 .getPayload()
@@ -68,7 +58,7 @@ public class JwtManager {
                 .issuedAt(new Date(now))
                 .issuer(jwtProperties.getIssuer())
                 .expiration(expirationTime)
-                .signWith(secretKey)
+                .signWith(keyPair.getPrivate())
                 .compact();
     }
 
