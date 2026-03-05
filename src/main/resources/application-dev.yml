@@ -50,10 +50,11 @@ management:
 
 jwt:
   key-id: ${JWT_KEY_ID}
-  secret: ${JWT_SECRET}
   access-expiration: ${JWT_ACCESS_EXPIRATION:3600000}  # 1 hour
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:86400000}  # 24 hours
   issuer: ${JWT_ISSUER}
+  public-key: ${JWT_PUBLIC_KEY}
+  private-key: ${JWT_PRIVATE_KEY}
 
 code:
   auth:
