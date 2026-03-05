@@ -32,7 +32,7 @@ public class MadpOAuth2UserService extends DefaultOAuth2UserService {
         log.info("[OAuth2UserService] additionalParameters: {}", userRequest.getAdditionalParameters());
         
         // State parameter 확인
-        String state = (String) userRequest.getAdditionalParameters().get("state");
+        String state = userRequest.getAdditionalParameters().get("state").toString();
         log.info("[OAuth2UserService] State parameter: '{}'", state);
         
         OAuth2User oauth2User = super.loadUser(userRequest);
