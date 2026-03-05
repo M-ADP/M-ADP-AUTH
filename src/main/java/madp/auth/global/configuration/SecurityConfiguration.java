@@ -4,7 +4,7 @@ import lombok.RequiredArgsConstructor;
 import madp.auth.global.enums.Role;
 import madp.auth.domain.infrastructure.security.handler.MadpOAuth2FailureHandler;
 import madp.auth.domain.infrastructure.security.handler.MadpOAuth2SuccessHandler;
-import madp.auth.domain.infrastructure.security.resolver.MadpOAuth2AuthorizationRequestResolver;
+import madp.auth.domain.infrastructure.security.repository.RedisOAuth2AuthorizationRequestRepository;
 import madp.auth.domain.infrastructure.security.service.MadpOAuth2UserService;
 import madp.auth.global.properties.WebProperties;
 import madp.auth.global.security.filter.MadpUserInfoExtractorFilter;
@@ -29,7 +29,7 @@ public class SecurityConfiguration {
     private final MadpOAuth2UserService madpOAuth2UserService;
     private final MadpOAuth2SuccessHandler madpOAuth2SuccessHandler;
     private final MadpOAuth2FailureHandler madpOAuth2FailureHandler;
-    private final MadpOAuth2AuthorizationRequestResolver madpOAuth2AuthorizationRequestResolver;
+    private final RedisOAuth2AuthorizationRequestRepository redisOAuth2AuthorizationRequestRepository;
 
     @Bean
     public PathMatcher pathMatcher() {return new AntPathMatcher();}
@@ -50,7 +50,7 @@ public class SecurityConfiguration {
                 .oauth2Login(oauth2 -> oauth2
                         .loginPage(webProperties.getFrontEndUrl() + "/login")
                         .authorizationEndpoint(authorization -> authorization
-                                .authorizationRequestResolver(madpOAuth2AuthorizationRequestResolver)
+                                .authorizationRequestRepository(redisOAuth2AuthorizationRequestRepository)
                         )
                         .redirectionEndpoint(redirection -> redirection
                                 .baseUri("/auth/oauth2/callback/*")
