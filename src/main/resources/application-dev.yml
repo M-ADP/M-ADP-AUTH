@@ -59,6 +59,8 @@ jwt:
 code:
   auth:
     expiration: ${AUTH_CODE_EXPIRATION:300000}  # 5 minutes
+  session:
+    expiration: ${SESSION_EXPIRATION:600000}
 
 web:
   front-end-url: ${FRONTEND_URL}
