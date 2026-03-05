@@ -2,17 +2,21 @@ package madp.auth.global.infrastructure.internal;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import madp.auth.domain.domain.entity.OAuth2SessionEntity;
+import madp.auth.domain.domain.repository.OAuth2SessionRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import jakarta.servlet.http.HttpServletRequest;
-import java.util.Base64;
 
 @Slf4j
 @Component
+@RequiredArgsConstructor
 public class InternalRequestInterceptor implements RequestInterceptor {
+    private final OAuth2SessionRepository oAuth2SessionRepository;
     
     @Override
     public void apply(RequestTemplate template) {
@@ -38,15 +42,10 @@ public class InternalRequestInterceptor implements RequestInterceptor {
 
         // OAuth2 콜백에서 state parameter 확인
         String state = request.getParameter("state");
-        if (state != null && !state.isEmpty()) {
-            String[] userInfo = decodeUserInfo(state);
-            if (isValidUserInfo(userInfo)) {
-                log.info("[InternalInterceptor] Found OAuth2 state - userId: {}, userRole: {}", userInfo[0], userInfo[1]);
-                addUserHeaders(template, userInfo[0], userInfo[1]);
-                return;
-            }
-            log.warn("[InternalInterceptor] Invalid user info in state parameter");
-        }
+        if(state == null || state.isEmpty()) return;
+        OAuth2SessionEntity oAuth2SessionEntity = getSessionByState(state);
+        if(oAuth2SessionEntity == null) return;
+        addUserHeaders(template, oAuth2SessionEntity.getUserId().toString(), oAuth2SessionEntity.getUserRole());
 
         log.info("[InternalInterceptor] No user info found in headers or state");
     }
@@ -57,24 +56,7 @@ public class InternalRequestInterceptor implements RequestInterceptor {
         template.header("X-User-Role", userRole);
     }
     
-    private String[] decodeUserInfo(String encodedState) {
-        if (encodedState == null || encodedState.isEmpty()) {
-            return null;
-        }
-
-        try {
-            String decoded = new String(Base64.getDecoder().decode(encodedState));
-            return decoded.split(":");
-        }
-        catch (IllegalArgumentException e) {
-            log.warn("[InternalInterceptor] Invalid Base64 format: {}", e.getMessage());
-            return null;
-        }
-    }
-    
-    private boolean isValidUserInfo(String[] userInfo) {
-        return userInfo != null && userInfo.length == 2 && 
-               userInfo[0] != null && !userInfo[0].isEmpty() &&
-               userInfo[1] != null && !userInfo[1].isEmpty();
+    private OAuth2SessionEntity getSessionByState(String state) {
+        return oAuth2SessionRepository.findBySessionId(state).orElse(null);
     }
 }
