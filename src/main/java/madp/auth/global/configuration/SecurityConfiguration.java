@@ -2,6 +2,7 @@ package madp.auth.global.configuration;
 
 import lombok.RequiredArgsConstructor;
 import madp.auth.domain.infrastructure.security.resolver.MadpOAuth2AuthorizationRequestResolver;
+import madp.auth.domain.infrastructure.security.repository.RedisOAuth2AuthorizationRequestRepository;
 import madp.auth.global.enums.Role;
 import madp.auth.domain.infrastructure.security.handler.MadpOAuth2FailureHandler;
 import madp.auth.domain.infrastructure.security.handler.MadpOAuth2SuccessHandler;
@@ -30,6 +31,7 @@ public class SecurityConfiguration {
     private final MadpOAuth2SuccessHandler madpOAuth2SuccessHandler;
     private final MadpOAuth2FailureHandler madpOAuth2FailureHandler;
     private final MadpOAuth2AuthorizationRequestResolver madpOAuth2AuthorizationRequestResolver;
+    private final RedisOAuth2AuthorizationRequestRepository redisOAuth2AuthorizationRequestRepository;
 
     @Bean
     public PathMatcher pathMatcher() {return new AntPathMatcher();}
@@ -42,7 +44,7 @@ public class SecurityConfiguration {
                 .httpBasic(AbstractHttpConfigurer::disable)
                 .cors(AbstractHttpConfigurer::disable)
                 .sessionManagement((session) -> session
-                        .sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+                        .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .anonymous(anonymous -> anonymous
                         .principal(Role.GUEST.name())
                         .authorities(Role.GUEST.getValue())
@@ -52,6 +54,7 @@ public class SecurityConfiguration {
                         .authorizationEndpoint(authorization -> authorization
                                 .baseUri("/auth/oauth2/authorization")
                                 .authorizationRequestResolver(madpOAuth2AuthorizationRequestResolver)
+                                .authorizationRequestRepository(redisOAuth2AuthorizationRequestRepository)
                         )
                         .redirectionEndpoint(redirection -> redirection
                                 .baseUri("/auth/oauth2/callback/*")
