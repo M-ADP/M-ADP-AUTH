@@ -13,9 +13,6 @@ import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.KeyPair;
-import java.security.interfaces.RSAPublicKey;
-import java.util.Base64;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,20 +22,15 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class AuthController {
     private final JwtProperties jwtProperties;
-    private final KeyPair keyPair;
     private final AuthService authService;
 
     @GetMapping("/.well-known/jwks.json")
     public Map<String, Object> getJwks() {
-        RSAPublicKey publicKey = (RSAPublicKey) keyPair.getPublic();
-
         Map<String, Object> jwks = new HashMap<>();
-        jwks.put("kty", "RSA");
-        jwks.put("alg", "RS256");
+        jwks.put("kty", "oct");
+        jwks.put("alg", "HS256");
         jwks.put("use", "sig");
         jwks.put("kid", jwtProperties.getKeyId());
-        jwks.put("n", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getModulus().toByteArray()));
-        jwks.put("e", Base64.getUrlEncoder().withoutPadding().encodeToString(publicKey.getPublicExponent().toByteArray()));
 
         return Map.of("keys", List.of(jwks));
     }
