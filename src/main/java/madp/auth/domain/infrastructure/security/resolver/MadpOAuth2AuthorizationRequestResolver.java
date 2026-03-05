@@ -7,7 +7,6 @@ import madp.auth.domain.domain.entity.OAuth2SessionEntity;
 import madp.auth.domain.domain.repository.OAuth2SessionRepository;
 import madp.auth.domain.infrastructure.security.constants.OAuth2SessionConstants;
 import madp.auth.global.properties.OAuth2SessionProperties;
-import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseCookie;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
@@ -94,10 +93,10 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
     private void addSessionCookie(HttpServletResponse response, String sessionKey) {
         ResponseCookie cookie = ResponseCookie.from(OAuth2SessionConstants.SESSION_COOKIE_NAME, sessionKey)
                 .httpOnly(true)
-                .secure(false)
+                .secure(true)
                 .path("/")
                 .maxAge(oAuth2SessionProperties.getExpiration())
-                .sameSite(Cookie.SameSite.LAX.name())
+                .sameSite("None")
                 .build();
 
         response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());

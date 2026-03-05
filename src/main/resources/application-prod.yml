@@ -50,7 +50,6 @@ management:
 
 jwt:
   key-id: ${JWT_KEY_ID}
-  secret: ${JWT_SECRET}
   access-expiration: ${JWT_ACCESS_EXPIRATION:3600000}  # 1 hour
   refresh-expiration: ${JWT_REFRESH_EXPIRATION:86400000}  # 24 hours
   issuer: ${JWT_ISSUER}
@@ -72,3 +71,6 @@ logging:
     root: WARN
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
+
+server:
+  forward-headers-strategy: framework
