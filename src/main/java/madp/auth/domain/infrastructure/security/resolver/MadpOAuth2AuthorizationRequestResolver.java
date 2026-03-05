@@ -11,8 +11,6 @@ import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequest
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Component;
 
-import java.util.UUID;
-
 @Slf4j
 @Component
 public class MadpOAuth2AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
@@ -60,28 +58,24 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
             return authorizationRequest;
         }
 
-        // 세션 생성 및 저장
-        String sessionId = createAndSaveSession(userId, userRole);
+        // state를 키로 세션 생성 및 저장
+        String state = authorizationRequest.getState();
+        createAndSaveSessionWithState(state, userId, userRole);
         
-        // additionalParameters에 sessionId 추가
-        return OAuth2AuthorizationRequest.from(authorizationRequest)
-                .additionalParameters(params -> params.put("session_id", sessionId))
-                .build();
+        // additionalParameters 추가하지 않고 원본 반환
+        return authorizationRequest;
     }
     
-    private String createAndSaveSession(String userId, String userRole) {
-        String sessionId = UUID.randomUUID().toString();
-        
+    private void createAndSaveSessionWithState(String state, String userId, String userRole) {
         OAuth2SessionEntity sessionEntity = OAuth2SessionEntity.builder()
-                .sessionId(sessionId)
+                .sessionId(state)  // state를 sessionId로 사용
                 .userId(Long.parseLong(userId))
                 .userRole(userRole)
                 .expiration(oAuth2SessionProperties.getExpiration())
                 .build();
                 
         oAuth2SessionRepository.save(sessionEntity);
-        log.info("[CustomResolver] Created session - sessionId: {}, userId: {}, userRole: {}", sessionId, userId, userRole);
-        
-        return sessionId;
+        log.info("[CustomResolver] Created session - state: {}, userId: {}, userRole: {}", state, userId, userRole);
     }
+    
 }

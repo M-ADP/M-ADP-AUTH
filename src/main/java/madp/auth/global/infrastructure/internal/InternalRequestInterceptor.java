@@ -39,12 +39,13 @@ public class InternalRequestInterceptor implements RequestInterceptor {
             return;
         }
 
-        // OAuth2 콜백에서 user_id, user_role parameter 확인
-        String sessionId = request.getParameter("session_id");
+        // OAuth2 콜백에서 state parameter 확인
+        String state = request.getParameter("state");
 
-        if (sessionId != null) {
-            log.info("[InternalInterceptor] Using OAuth2 callback parameters for user info");
-            oAuth2SessionRepository.findBySessionId(sessionId).ifPresent(oAuth2Session -> addUserHeaders(template, oAuth2Session.getUserId().toString(), oAuth2Session.getUserRole()));
+        if (state != null) {
+            log.info("[InternalInterceptor] Using OAuth2 callback state parameter for user info");
+            oAuth2SessionRepository.findBySessionId(state).ifPresent(oAuth2Session -> 
+                addUserHeaders(template, oAuth2Session.getUserId().toString(), oAuth2Session.getUserRole()));
         }
     }
     
