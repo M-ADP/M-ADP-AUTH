@@ -29,7 +29,7 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
             OAuth2SessionRepository oauth2SessionRepository,
             OAuth2SessionProperties oAuth2SessionProperties) {
         this.defaultResolver = new DefaultOAuth2AuthorizationRequestResolver(
-            clientRegistrationRepository, "/oauth2/authorization");
+            clientRegistrationRepository, "/auth/oauth2/authorization");
         this.oauth2SessionRepository = oauth2SessionRepository;
         this.oAuth2SessionProperties = oAuth2SessionProperties;
     }
