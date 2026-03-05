@@ -1,40 +1,23 @@
 package madp.auth.domain.infrastructure.security.resolver;
 
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.slf4j.Slf4j;
-import madp.auth.domain.domain.entity.OAuth2SessionEntity;
-import madp.auth.domain.domain.repository.OAuth2SessionRepository;
-import madp.auth.domain.infrastructure.security.constants.OAuth2SessionConstants;
-import madp.auth.global.properties.OAuth2SessionProperties;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.oauth2.client.registration.ClientRegistrationRepository;
 import org.springframework.security.oauth2.client.web.DefaultOAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.client.web.OAuth2AuthorizationRequestResolver;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Component;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
 
-import java.util.UUID;
+import java.util.Base64;
 
 @Slf4j
 @Component
 public class MadpOAuth2AuthorizationRequestResolver implements OAuth2AuthorizationRequestResolver {
 
     private final DefaultOAuth2AuthorizationRequestResolver defaultResolver;
-    private final OAuth2SessionRepository oauth2SessionRepository;
-    private final OAuth2SessionProperties oAuth2SessionProperties;
 
-    public MadpOAuth2AuthorizationRequestResolver(
-            ClientRegistrationRepository clientRegistrationRepository,
-            OAuth2SessionRepository oauth2SessionRepository,
-            OAuth2SessionProperties oAuth2SessionProperties) {
-        this.defaultResolver = new DefaultOAuth2AuthorizationRequestResolver(
-            clientRegistrationRepository, "/auth/oauth2/authorization");
-        this.oauth2SessionRepository = oauth2SessionRepository;
-        this.oAuth2SessionProperties = oAuth2SessionProperties;
+    public MadpOAuth2AuthorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository) {
+        this.defaultResolver = new DefaultOAuth2AuthorizationRequestResolver(clientRegistrationRepository, "/auth/oauth2/authorization");
     }
 
     @Override
@@ -51,54 +34,36 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
 
     private OAuth2AuthorizationRequest customizeAuthorizationRequest(
             OAuth2AuthorizationRequest authorizationRequest, HttpServletRequest request) {
-        
+
+        // OAuth2 인증 안 함
         if (authorizationRequest == null) {
             return null;
         }
 
-        // 원본 헤더 정보 저장
-        String sessionKey = UUID.randomUUID().toString();
         String userId = request.getHeader("X-User-Id");
         String userRole = request.getHeader("X-User-Role");
 
         if (userId != null && userRole != null) {
-            OAuth2SessionEntity sessionEntity = OAuth2SessionEntity.builder()
-                    .sessionKey(sessionKey)
-                    .userId(userId)
-                    .userRole(userRole)
-                    .timeToLive(600L) // 10분
+            log.info("[OAuth2Resolver] Found headers - userId: {}, userRole: {}", userId, userRole);
+
+            // State parameter에 사용자 정보 인코딩
+            String encodedState = encodeUserInfo(userId, userRole);
+            log.info("[OAuth2Resolver] Encoded state: {}", encodedState);
+
+            // 기존 authorizationRequest를 복사하면서 state 추가
+            return OAuth2AuthorizationRequest.from(authorizationRequest)
+                    .state(encodedState)
                     .build();
-
-            oauth2SessionRepository.save(sessionEntity);
-
-            log.info(sessionKey);
-            log.info(userId);
-
-            // 쿠키에 세션 키 저장
-            setCookie(sessionKey);
         }
 
+        log.info("[OAuth2Resolver] No headers found, returning original authorizationRequest");
         return authorizationRequest;
     }
 
-    private void setCookie(String sessionKey) {
-        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
-        HttpServletResponse response = attrs.getResponse();
-
-        if (response != null) {
-            addSessionCookie(response, sessionKey);
-        }
-    }
-
-    private void addSessionCookie(HttpServletResponse response, String sessionKey) {
-        ResponseCookie cookie = ResponseCookie.from(OAuth2SessionConstants.SESSION_COOKIE_NAME, sessionKey)
-                .httpOnly(true)
-                .secure(true)
-                .path("/")
-                .maxAge(oAuth2SessionProperties.getExpiration())
-                .sameSite("None")
-                .build();
-
-        response.addHeader(HttpHeaders.SET_COOKIE, cookie.toString());
+    private String encodeUserInfo(String userId, String userRole) {
+        String data = userId + ":" + userRole;
+        String encoded = Base64.getEncoder().encodeToString(data.getBytes());
+        log.info("[OAuth2Resolver] Encoding '{}' -> '{}'", data, encoded);
+        return encoded;
     }
 }

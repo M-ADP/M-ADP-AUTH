@@ -30,6 +30,7 @@ public class MadpOAuth2UserService extends DefaultOAuth2UserService {
 
         if(madpOAuth2UserInfo == null) throw new FailedOAuth2AuthenticationException();
         
+        // 기존 로직 유지: 외부 API 호출
         OAuth2UserInformationRequestDto oAuth2UserInformationRequestDto = new OAuth2UserInformationRequestDto(madpOAuth2UserInfo.providerId(), madpOAuth2UserInfo.mail(), madpOAuth2UserInfo.profile(), madpOAuth2UserInfo.name(), oAuth2Type);
         UserAuthResponseDto userAuthResponseDto = userClient.getUserAuthStatus(oAuth2UserInformationRequestDto);
 
@@ -40,4 +41,5 @@ public class MadpOAuth2UserService extends DefaultOAuth2UserService {
                 .attributes(oauth2User.getAttributes())
                 .build();
     }
+
 }
