@@ -6,7 +6,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 @Getter
 @RequiredArgsConstructor
-@ConfigurationProperties(prefix = "oauth2.session")
+@ConfigurationProperties(prefix = "code.session")
 public class OAuth2SessionProperties {
     private final Long expiration;
 }
