@@ -5,6 +5,8 @@ import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.data.redis.serializer.JdkSerializationRedisSerializer;
+import org.springframework.data.redis.serializer.StringRedisSerializer;
 import org.springframework.security.oauth2.client.web.AuthorizationRequestRepository;
 import org.springframework.security.oauth2.core.endpoint.OAuth2AuthorizationRequest;
 import org.springframework.stereotype.Repository;
@@ -23,6 +25,17 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
     
     private final RedisTemplate<String, Object> redisTemplate;
     
+    private RedisTemplate<String, OAuth2AuthorizationRequest> getJdkRedisTemplate() {
+        RedisTemplate<String, OAuth2AuthorizationRequest> template = new RedisTemplate<>();
+        template.setConnectionFactory(redisTemplate.getConnectionFactory());
+        template.setKeySerializer(new StringRedisSerializer());
+        template.setValueSerializer(new JdkSerializationRedisSerializer());
+        template.setHashKeySerializer(new StringRedisSerializer());
+        template.setHashValueSerializer(new JdkSerializationRedisSerializer());
+        template.afterPropertiesSet();
+        return template;
+    }
+    
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
         String state = getStateParameter(request);
@@ -31,7 +44,7 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
         }
         
         String key = OAUTH2_AUTHORIZATION_REQUEST_PREFIX + state;
-        OAuth2AuthorizationRequest authorizationRequest = (OAuth2AuthorizationRequest) redisTemplate.opsForValue().get(key);
+        OAuth2AuthorizationRequest authorizationRequest = getJdkRedisTemplate().opsForValue().get(key);
         log.debug("Loading authorization request for state: {}, found: {}", state, authorizationRequest != null);
         
         return authorizationRequest;
@@ -51,7 +64,7 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
         }
         
         String key = OAUTH2_AUTHORIZATION_REQUEST_PREFIX + state;
-        redisTemplate.opsForValue().set(key, authorizationRequest, EXPIRATION_MINUTES, TimeUnit.MINUTES);
+        getJdkRedisTemplate().opsForValue().set(key, authorizationRequest, EXPIRATION_MINUTES, TimeUnit.MINUTES);
         log.debug("Saved authorization request for state: {}", state);
     }
     
@@ -63,10 +76,10 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
         }
         
         String key = OAUTH2_AUTHORIZATION_REQUEST_PREFIX + state;
-        OAuth2AuthorizationRequest authorizationRequest = (OAuth2AuthorizationRequest) redisTemplate.opsForValue().get(key);
+        OAuth2AuthorizationRequest authorizationRequest = getJdkRedisTemplate().opsForValue().get(key);
         
         if (authorizationRequest != null) {
-            redisTemplate.delete(key);
+            getJdkRedisTemplate().delete(key);
             log.debug("Removed authorization request for state: {}", state);
         }
         
