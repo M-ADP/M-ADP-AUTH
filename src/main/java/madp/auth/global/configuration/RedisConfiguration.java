@@ -40,8 +40,8 @@ public class RedisConfiguration {
         JdkSerializationRedisSerializer jdkSerializationRedisSerializer = new JdkSerializationRedisSerializer();
 
         redisTemplate.setKeySerializer(stringSerializer);
-        redisTemplate.setHashKeySerializer(jdkSerializationRedisSerializer);
-        redisTemplate.setValueSerializer(stringSerializer);
+        redisTemplate.setHashKeySerializer(stringSerializer);
+        redisTemplate.setValueSerializer(jdkSerializationRedisSerializer);
         redisTemplate.setHashValueSerializer(jdkSerializationRedisSerializer);
     }
 

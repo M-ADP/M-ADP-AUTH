@@ -20,7 +20,7 @@ import java.util.concurrent.TimeUnit;
 public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationRequestRepository<OAuth2AuthorizationRequest> {
     
     private final OAuth2SessionProperties oAuth2SessionProperties;
-    private final RedisTemplate<String, OAuth2AuthorizationRequest> oAuth2AuthorizationRequestRedisTemplate;
+    private final RedisTemplate<String, OAuth2AuthorizationRequest> redisOAuth2Template;
     
     @Override
     public OAuth2AuthorizationRequest loadAuthorizationRequest(HttpServletRequest request) {
@@ -30,7 +30,7 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
         }
         
         String key = OAuth2AuthorizationConstants.OAUTH2_AUTHORIZATION_REQUEST + state;
-        OAuth2AuthorizationRequest authorizationRequest = oAuth2AuthorizationRequestRedisTemplate.opsForValue().get(key);
+        OAuth2AuthorizationRequest authorizationRequest = redisOAuth2Template.opsForValue().get(key);
         log.debug("Loading authorization request for state: {}, found: {}", state, authorizationRequest != null);
         
         return authorizationRequest;
@@ -50,7 +50,7 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
         }
         
         String key = OAuth2AuthorizationConstants.OAUTH2_AUTHORIZATION_REQUEST + state;
-        oAuth2AuthorizationRequestRedisTemplate.opsForValue().set(key, authorizationRequest, oAuth2SessionProperties.getExpiration(), TimeUnit.MILLISECONDS);
+        redisOAuth2Template.opsForValue().set(key, authorizationRequest, oAuth2SessionProperties.getExpiration(), TimeUnit.MILLISECONDS);
         log.debug("Saved authorization request for state: {}", state);
     }
     
@@ -62,10 +62,10 @@ public class RedisOAuth2AuthorizationRequestRepository implements AuthorizationR
         }
         
         String key = OAuth2AuthorizationConstants.OAUTH2_AUTHORIZATION_REQUEST + state;
-        OAuth2AuthorizationRequest authorizationRequest = oAuth2AuthorizationRequestRedisTemplate.opsForValue().get(key);
+        OAuth2AuthorizationRequest authorizationRequest = redisOAuth2Template.opsForValue().get(key);
         
         if (authorizationRequest != null) {
-            oAuth2AuthorizationRequestRedisTemplate.delete(key);
+            redisOAuth2Template.delete(key);
             log.debug("Removed authorization request for state: {}", state);
         }
         
