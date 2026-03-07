@@ -6,6 +6,7 @@ import madp.auth.domain.application.service.AuthService;
 import madp.auth.domain.exception.RefreshTokenNotFoundException;
 import madp.auth.domain.infrastructure.jwt.constants.JwtConstants;
 import madp.auth.domain.presentation.dto.request.AuthCodeRequestDto;
+import madp.auth.domain.presentation.dto.response.AuthStatusResponse;
 import madp.auth.domain.presentation.dto.response.TokenResponseDto;
 import madp.auth.global.properties.JwtProperties;
 import org.springframework.http.HttpHeaders;
@@ -64,7 +65,14 @@ public class AuthController {
 
     @PostMapping("/code")
     public ResponseEntity<Map<String, String>> authCode(@RequestBody @Valid AuthCodeRequestDto authCodeRequestDto) {
-        String accessToken = authService.getAccessTokenByAuthCode(authCodeRequestDto.code());
-        return ResponseEntity.ok().body(Map.of("access_token", accessToken));
+        AuthStatusResponse authStatusResponse = authService.getAuthStatusByAuthCode(authCodeRequestDto.code());
+        return ResponseEntity.ok()
+                .header(HttpHeaders.SET_COOKIE, authStatusResponse.tokenResponseDto().refreshTokenCookie().toString())
+                .body(
+                        Map.of(
+                                "access_token", authStatusResponse.tokenResponseDto().accessToken(),
+                                "is_authenticated", authStatusResponse.isAuthenticated().toString()
+                        )
+                );
     }
 }

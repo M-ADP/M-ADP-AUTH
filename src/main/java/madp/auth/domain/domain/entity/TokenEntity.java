@@ -11,9 +11,9 @@ import org.springframework.data.redis.core.TimeToLive;
 @RedisHash(value = "token")
 public class TokenEntity {
     @Id
-    private final String token;
-
     private final Long userId;
+
+    private String token;
 
     @TimeToLive
     private final Long expiration;
@@ -42,6 +42,10 @@ public class TokenEntity {
     private void validateExpirationField(Long expiration) {
         if(expiration == null || expiration < 0)
             throw new InvalidTokenInfoException("expiration 값은 0 이상이어야 합니다.");
+    }
+
+    public void updateToken(String refreshToken) {
+        this.token = refreshToken;
     }
 
 }

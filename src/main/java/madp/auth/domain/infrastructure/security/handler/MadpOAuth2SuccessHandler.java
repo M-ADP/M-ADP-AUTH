@@ -6,17 +6,12 @@ import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import madp.auth.domain.domain.entity.AuthCodeEntity;
-import madp.auth.domain.domain.entity.TokenEntity;
 import madp.auth.global.enums.Role;
 import madp.auth.domain.domain.repository.AuthCodeRepository;
-import madp.auth.domain.domain.repository.TokenRepository;
 import madp.auth.domain.infrastructure.jwt.JwtManager;
 import madp.auth.domain.infrastructure.security.vo.MadpOAuth2User;
 import madp.auth.global.properties.AuthCodeProperties;
-import madp.auth.global.properties.JwtProperties;
 import madp.auth.global.properties.WebProperties;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
@@ -30,9 +25,7 @@ import java.util.UUID;
 public class MadpOAuth2SuccessHandler implements AuthenticationSuccessHandler {
     private final JwtManager jwtManager;
     private final AuthCodeProperties authCodeProperties;
-    private final TokenRepository tokenRepository;
     private final AuthCodeRepository authCodeRepository;
-    private final JwtProperties jwtProperties;
     private final WebProperties webProperties;
 
     @Override
@@ -64,12 +57,6 @@ public class MadpOAuth2SuccessHandler implements AuthenticationSuccessHandler {
         log.info("[OAuth2SuccessHandler] Generated authCode: {}", authCode);
         createAuthCode(authCode, accessToken);
 
-        String refreshToken = jwtManager.generateRefreshToken(userId, role);
-        saveRefreshToken(refreshToken, userId);
-
-        ResponseCookie refreshTokenCookie = jwtManager.createRefreshTokenCookie(refreshToken);
-        response.addHeader(HttpHeaders.SET_COOKIE, refreshTokenCookie.toString());
-
         log.info("[OAuth2SuccessHandler] Redirecting to frontend callback");
         redirectToCallback(response, authCode);
         log.info("[OAuth2SuccessHandler] ===== SUCCESS HANDLER END =====");
@@ -82,15 +69,6 @@ public class MadpOAuth2SuccessHandler implements AuthenticationSuccessHandler {
                 .timeToLive(authCodeProperties.getExpiration())
                 .build();
         authCodeRepository.save(authCodeEntity);
-    }
-
-    private void saveRefreshToken(String refreshToken, Long userId) {
-        TokenEntity tokenEntity = TokenEntity.builder()
-                .token(refreshToken)
-                .userId(userId)
-                .expiration(jwtProperties.getRefreshExpiration())
-                .build();
-        tokenRepository.save(tokenEntity);
     }
 
     private void redirectToErrorPage(HttpServletResponse response) throws IOException {
