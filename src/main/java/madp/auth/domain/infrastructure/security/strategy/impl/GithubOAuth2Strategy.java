@@ -24,13 +24,13 @@ public class GithubOAuth2Strategy implements OAuth2Strategy {
         String providerId = attributes.get("id").toString();
         String mail =  attributes.get("email").toString();
         String profile = attributes.get("avatar_url").toString();
-        String name = attributes.get("name").toString();
+        String nickname = attributes.get("login").toString();
 
         log.debug(providerId);
         log.debug(mail);
         log.debug(profile);
-        log.debug(name);
+        log.debug(nickname);
 
-        return new MadpOAuth2UserInfo(providerId, mail, profile, name, OAuth2Type.GITHUB);
+        return new MadpOAuth2UserInfo(providerId, mail, profile, nickname, OAuth2Type.GITHUB);
     }
 }
