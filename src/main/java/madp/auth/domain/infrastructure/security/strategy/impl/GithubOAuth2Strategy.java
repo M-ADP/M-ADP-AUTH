@@ -22,7 +22,7 @@ public class GithubOAuth2Strategy implements OAuth2Strategy {
     public MadpOAuth2UserInfo getUserInfo(OAuth2User user) {
         Map<String, Object> attributes = user.getAttributes();
         String providerId = attributes.get("id").toString();
-        String mail =  attributes.get("email").toString();
+        String mail =  String.valueOf(attributes.get("email"));
         String profile = attributes.get("avatar_url").toString();
         String nickname = attributes.get("login").toString();
 
