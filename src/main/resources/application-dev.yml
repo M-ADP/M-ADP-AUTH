@@ -71,10 +71,6 @@ email:
 logging:
   level:
     madp.auth: INFO
-    org.springframework.security: TRACE
-    root: TRACE
-    feign: TRACE
-    madp.auth.domain.infrastructure.client: TRACE
   pattern:
     console: "%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n"
 
