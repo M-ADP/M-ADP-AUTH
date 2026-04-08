@@ -2,6 +2,7 @@ package madp.auth.domain.infrastructure.security.strategy.impl;
 
 import lombok.RequiredArgsConstructor;
 import madp.auth.domain.domain.enums.OAuth2Type;
+import madp.auth.domain.domain.repository.TestUserRepository;
 import madp.auth.domain.exception.UnsupportedAccountException;
 import madp.auth.domain.infrastructure.security.strategy.OAuth2Strategy;
 import madp.auth.domain.infrastructure.security.vo.MadpOAuth2UserInfo;
@@ -15,6 +16,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class GoogleOAuth2Strategy implements OAuth2Strategy {
     private final EmailProperties emailProperties;
+    private final TestUserRepository testUserRepository;
 
     @Override
     public OAuth2Type getOAuth2ProviderType() {
@@ -29,7 +31,7 @@ public class GoogleOAuth2Strategy implements OAuth2Strategy {
         String profile = String.valueOf(attributes.get("picture"));
         String name = String.valueOf(attributes.get("name"));
 
-        if (mail == null || !mail.endsWith(emailProperties.getAllowedDomain())) {
+        if (mail == null || !testUserRepository.existsById(mail)) {
             throw new UnsupportedAccountException(emailProperties.getAllowedDomain());
         }
 
