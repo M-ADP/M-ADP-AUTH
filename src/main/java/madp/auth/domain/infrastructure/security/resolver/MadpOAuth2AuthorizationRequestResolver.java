@@ -52,16 +52,21 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
         String userRole = request.getHeader("X-User-Role");
 
         log.info("[CustomResolver] Creating authorization request - userId: {}, userRole: {}", userId, userRole);
+        log.info("[CustomResolver] Request URI: {}", request.getRequestURI());
+        log.info("[CustomResolver] authorizationRequest state: {}", authorizationRequest.getState());
+        log.info("[CustomResolver] authorizationRequest registrationId: {}", authorizationRequest.getAttribute("registration_id"));
 
         // 사용자 정보가 없으면 기본 요청 반환
         if (userId == null || userRole == null) {
+            log.info("[CustomResolver] userId or userRole is null - returning without saving session");
             return authorizationRequest;
         }
 
         // state를 키로 세션 생성 및 저장
         String state = authorizationRequest.getState();
+        log.info("[CustomResolver] Saving session with state: {}", state);
         createAndSaveSessionWithState(state, userId, userRole);
-        
+
         // additionalParameters 추가하지 않고 원본 반환
         return authorizationRequest;
     }

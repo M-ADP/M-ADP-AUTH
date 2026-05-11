@@ -2,14 +2,16 @@ package madp.auth.global.infrastructure.internal;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import madp.auth.domain.domain.entity.OAuth2SessionEntity;
 import madp.auth.domain.domain.repository.OAuth2SessionRepository;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import jakarta.servlet.http.HttpServletRequest;
+import java.util.Optional;
 
 @Slf4j
 @Component
@@ -41,11 +43,24 @@ public class InternalRequestInterceptor implements RequestInterceptor {
 
         // OAuth2 콜백에서 state parameter 확인
         String state = request.getParameter("state");
+        log.info("[InternalInterceptor] state parameter: {}", state);
+        log.info("[InternalInterceptor] Request URI: {}", request.getRequestURI());
+        log.info("[InternalInterceptor] Request URL: {}", request.getRequestURL());
+        log.info("[InternalInterceptor] All parameters: {}", request.getParameterMap().keySet());
 
         if (state != null) {
-            log.info("[InternalInterceptor] Using OAuth2 callback state parameter for user info");
-            oAuth2SessionRepository.findBySessionId(state).ifPresent(oAuth2Session -> 
-                addUserHeaders(template, oAuth2Session.getUserId().toString(), oAuth2Session.getUserRole()));
+            log.info("[InternalInterceptor] Searching OAuth2Session by state: {}", state);
+            Optional<OAuth2SessionEntity> sessionOpt = oAuth2SessionRepository.findBySessionId(state);
+            log.info("[InternalInterceptor] OAuth2Session found: {}", sessionOpt.isPresent());
+            if (sessionOpt.isPresent()) {
+                OAuth2SessionEntity oAuth2Session = sessionOpt.get();
+                log.info("[InternalInterceptor] Session userId: {}, userRole: {}", oAuth2Session.getUserId(), oAuth2Session.getUserRole());
+                addUserHeaders(template, oAuth2Session.getUserId().toString(), oAuth2Session.getUserRole());
+            } else {
+                log.warn("[InternalInterceptor] No OAuth2Session found for state: {} - userId will be null", state);
+            }
+        } else {
+            log.info("[InternalInterceptor] No state parameter and no X-User-Id/X-User-Role headers - skipping user info");
         }
     }
     
