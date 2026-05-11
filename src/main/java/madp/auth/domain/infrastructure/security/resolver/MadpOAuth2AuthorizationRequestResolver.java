@@ -54,7 +54,6 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
         log.info("[CustomResolver] Creating authorization request - userId: {}, userRole: {}", userId, userRole);
         log.info("[CustomResolver] Request URI: {}", request.getRequestURI());
         log.info("[CustomResolver] authorizationRequest state: {}", authorizationRequest.getState());
-        log.info("[CustomResolver] authorizationRequest registrationId: {}", authorizationRequest.getAttribute("registration_id"));
 
         // 사용자 정보가 없으면 기본 요청 반환
         if (userId == null || userRole == null) {
