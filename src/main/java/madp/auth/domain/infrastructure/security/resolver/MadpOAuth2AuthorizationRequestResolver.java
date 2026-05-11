@@ -18,7 +18,7 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
     private final DefaultOAuth2AuthorizationRequestResolver defaultResolver;
     private final OAuth2SessionRepository oAuth2SessionRepository;
     private final OAuth2SessionProperties oAuth2SessionProperties;
-    
+
     public MadpOAuth2AuthorizationRequestResolver(ClientRegistrationRepository clientRegistrationRepository, OAuth2SessionRepository oAuth2SessionRepository, OAuth2SessionProperties oAuth2SessionProperties) {
         this.defaultResolver = new DefaultOAuth2AuthorizationRequestResolver(
                 clientRegistrationRepository, "/auth/oauth2/authorization"
@@ -69,7 +69,7 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
         // additionalParameters 추가하지 않고 원본 반환
         return authorizationRequest;
     }
-    
+
     private void createAndSaveSessionWithState(String state, String userId, String userRole) {
         OAuth2SessionEntity sessionEntity = OAuth2SessionEntity.builder()
                 .sessionId(state)  // state를 sessionId로 사용
@@ -77,9 +77,9 @@ public class MadpOAuth2AuthorizationRequestResolver implements OAuth2Authorizati
                 .userRole(userRole)
                 .expiration(oAuth2SessionProperties.getExpiration())
                 .build();
-                
+
         oAuth2SessionRepository.save(sessionEntity);
         log.info("[CustomResolver] Created session - state: {}, userId: {}, userRole: {}", state, userId, userRole);
     }
-    
+
 }
