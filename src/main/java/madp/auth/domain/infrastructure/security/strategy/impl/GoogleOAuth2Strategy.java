@@ -31,7 +31,7 @@ public class GoogleOAuth2Strategy implements OAuth2Strategy {
         String profile = String.valueOf(attributes.get("picture"));
         String name = String.valueOf(attributes.get("name"));
 
-        if (mail == null || !testUserRepository.existsById(mail)) {
+        if (mail == null || !mail.endsWith("@bssm.hs.kr")) {
             throw new UnsupportedAccountException(emailProperties.getAllowedDomain());
         }
 
